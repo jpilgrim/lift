@@ -1,12 +1,10 @@
-package lift;
+package lift.boundary;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
 /**
  * Die Türen benötigen 500  Millisekunden zum schließen.
- * 
- * HACK: Das ist natürlich für die Tests fast zu langsam. Aber wie kann man das lösen?
  */
 public class Doors {
 

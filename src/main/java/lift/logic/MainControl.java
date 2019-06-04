@@ -1,9 +1,7 @@
 package lift.logic;
 
-import java.util.function.Supplier;
-
-import lift.Doors;
-import lift.Requests;
+import lift.boundary.Doors;
+import lift.boundary.Requests;
 import lift.stm.State;
 import lift.stm.Transition;
 
@@ -12,11 +10,6 @@ import lift.stm.Transition;
  *
  */
 public class MainControl {
-
-	/**
-	 * Kommt irgendwie bekannt vor...
-	 */
-	private static final int MAX_FLOOR = 13;
 
 	/**
 	 * Die Anfragen nach oben. Diese werden über {@link #requestUp(int)}
@@ -33,7 +26,7 @@ public class MainControl {
 	 * "up/down" dann berechnet werden -- das interessiert hier aber aktuell nicht.
 	 */
 	final Requests downRequests = new Requests();
-	
+
 	/**
 	 * Das aktuelle Stockwerk.
 	 */
@@ -46,8 +39,7 @@ public class MainControl {
 
 	/**
 	 * Der aktuelle Zustand, wird über {@link #start()} in den ersten Zustand
-	 * gesetzt.
-	 * Public for testing!
+	 * gesetzt. Public for testing!
 	 */
 	public State currentState = null;
 
@@ -55,8 +47,6 @@ public class MainControl {
 	 * Der initiale Zustand, wird im Konstruktor gesetzt
 	 */
 	final State initialState;
-	
-	
 
 	/**
 	 * Flag das anzeigt, ob der Lift sich bewegt.
@@ -80,9 +70,9 @@ public class MainControl {
 				moveDown();
 			}
 		};
-		
+
 		initialState = initializing;
-		
+
 		State openingDoors = new State("openingDoors") {
 			@Override
 			public void entry() {
@@ -97,137 +87,43 @@ public class MainControl {
 		State idle = new State("idle") {
 		};
 
-		State closeForUp = new State("closeForUp") {
-			@Override
-			public void do_() {
-				closeDoors();
-			}
-		};
-		State fastMovingDown = new State("fastMovingDown") {
-			@Override
-			public void do_() {
-				moveDown();
-			}
-		};
-		State movingUp = new State("movingUp") {
-			@Override
-			public void do_() {
-				moveUp();
-			}
-		};
-		State openingDoorsDuringUp = new State("openingDoorsDuringUp") {
-			@Override
-			public void entry() {
-				stop();
-				upRequests.remove(currentFloor);
-			}
-
-			@Override
-			public void do_() {
-				openDoors();
-			}
-		};
-		State waitAfterUp = new State("waitAfterUp") {
-		};
-		State closeDuringUp = new State("closeDuringUp") {
-			@Override
-			public void do_() {
-				closeDoors();
-			}
-		};
-
-		State closeForDown = new State("closeForDown") {
-			@Override
-			public void do_() {
-				closeDoors();
-			}
-		};
-		State fastMovingUp= new State("fastMovingUp") {
-			@Override
-			public void do_() {
-				moveUp();
-			}
-		};
-		State movingDown = new State("movingDown") {
-			@Override
-			public void do_() {
-				moveDown();
-			}
-		};
-		State openingDoorsDuringDown = new State("openingDoorsDuringDown") {
-			@Override
-			public void entry() {
-				stop();
-				downRequests.remove(currentFloor);
-			}
-			
-			@Override
-			public void do_() {
-				openDoors();
-			}
-		};
-		State waitAfterDown = new State("waitAfterDown") {
-		};
-		State closeDuringDown = new State("closeDuringDown") {
-			@Override
-			public void do_() {
-				closeDoors();
-			}
-		};
+		// TODO ergänzen Sie hier die fehlenden States
 
 		// und nun alle Transitionen:
+
 		new Transition(initializing, openingDoors).when(() -> currentFloor == 0);
 		new Transition(openingDoors, idle).when(() -> doors.isOpened());
-		new Transition(idle, closeForUp).when(() -> !upRequests.isEmpty() && downRequests.isEmpty());
-		new Transition(idle, closeForDown).when(() -> !downRequests.isEmpty());
-		// hoch fahren (oder runter fahren um hoch zu fahren)
-		Supplier<Boolean> fastMovingDownCond = () -> currentFloor > upRequests.min();
-		new Transition(closeForUp, fastMovingDown).when(() -> doors.isClosed() && fastMovingDownCond.get());
-		new Transition(closeForUp, movingUp).when(() -> doors.isClosed() && !fastMovingDownCond.get()); // else
-		
-		new Transition(fastMovingDown, openingDoorsDuringUp)
-				.when(() -> doors.isClosed() && currentFloor == upRequests.min());
-		new Transition(movingUp, openingDoorsDuringUp).when(() -> upRequests.contains(currentFloor));
 
-		new Transition(openingDoorsDuringUp, waitAfterUp).when(() -> doors.isOpened());
-
-		new Transition(waitAfterUp, closeDuringUp).after(1000).guard(() -> !upRequests.isEmpty() && currentFloor < upRequests.max());
-		new Transition(waitAfterUp, idle).after(2000);
-		new Transition(closeDuringUp, movingUp).when(() -> doors.isClosed());
-
-		// runter fahren (oder hoch fahren um runter zu fahren)
-		Supplier<Boolean> fastMovingUpCond = () -> currentFloor < downRequests.max();
-		new Transition(closeForDown, fastMovingUp).when(() -> doors.isClosed() && fastMovingUpCond.get());
-		new Transition(closeForDown, movingDown).when(() -> doors.isClosed() && !fastMovingUpCond.get()); // else
-		
-		new Transition(fastMovingUp, openingDoorsDuringDown)
-				.when(() -> doors.isClosed() && currentFloor == downRequests.max());
-		new Transition(movingDown, openingDoorsDuringDown).when(() -> downRequests.contains(currentFloor));
-		
-		new Transition(openingDoorsDuringDown, waitAfterDown).when(() -> doors.isOpened());
-		
-		new Transition(waitAfterDown, closeDuringDown).after(1000).guard(() -> !downRequests.isEmpty() && currentFloor > downRequests.max());
-		new Transition(waitAfterDown, idle).after(2000);
-    	new Transition(closeDuringDown, movingDown).when(() -> doors.isClosed());
+		// TODO ergänzen Sie hier die fehlenden Transitionen
 	}
 
+	/**
+	 * Behaviour: Öffnen der Türen
+	 */
 	protected void openDoors() {
 		doors.open();
 	}
 
-	protected void closeDoors() {
-		doors.close();
-	}
-
+	/**
+	 * Behaviour: Stoppen des Aufzugs, aufgrund der aktuellen Implementierung hier
+	 * einfach als Flag umgesetzt.
+	 */
 	protected void stop() {
 		moving = false;
 	}
 
+	/**
+	 * Behaviour: Löschen aller Anfragen.
+	 */
 	protected void clearRequests() {
 		upRequests.clear();
 		downRequests.clear();
 	}
 
+	/**
+	 * Behaviour: Nach unten Fahren, aufgrund der aktuellen Implementierung wird
+	 * hier immer nur ein Stockwerk nach unten gefahren.
+	 */
 	protected void moveDown() {
 		moving = true;
 		if (currentFloor > 0) {
@@ -235,12 +131,7 @@ public class MainControl {
 		}
 	}
 
-	protected void moveUp() {
-		moving = true;
-		if (currentFloor < MAX_FLOOR) {
-			currentFloor++;
-		}
-	}
+	// TODO ergänzen Sie bei Bedarf hier weitere "Behaviours"
 
 	@Override
 	public String toString() {
@@ -251,11 +142,11 @@ public class MainControl {
 		strb.append(currentState).append(": currentFloor=").append(currentFloor)
 				.append(doors.isOpened() ? ", open" : ", closed").append(moving ? ", moving" : "");
 		if (!downRequests.isEmpty()) {
-				strb.append(", downRequests=").append(downRequests);
+			strb.append(", downRequests=").append(downRequests);
 		}
 		if (!upRequests.isEmpty()) {
-			strb.append(", upRequests=")
-				.append(upRequests);}
+			strb.append(", upRequests=").append(upRequests);
+		}
 		return strb.toString();
 	}
 
@@ -278,14 +169,14 @@ public class MainControl {
 	public boolean step() {
 		boolean changed = false;
 		Transition transition = currentState.trigger();
-		if (transition!=null) {
+		if (transition != null) {
 			currentState.deactivate();
 			currentState.exit();
 			currentState = transition.target;
 			currentState.entry();
 			currentState.activate();
 			changed = true;
-			
+
 		}
 		currentState.do_();
 		return changed;

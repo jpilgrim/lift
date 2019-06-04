@@ -84,19 +84,13 @@ public class Trigger {
 		this.guard = guard;
 	}
 
-	/**
-	 * HACK: Public, damit diese Methode vom Control aufgerufen werden kann.
-	 */
-	public void activate() {
+	void activate() {
 		if (change instanceof TimeEvent) {
 			((TimeEvent) change).start();
 		}
 	}
 
-	/**
-	 * HACK: Public, damit diese Methode vom Control aufgerufen werden kann.
-	 */
-	public void deactivate() {
+	void deactivate() {
 		if (change instanceof TimeEvent) {
 			((TimeEvent) change).stop();
 		}

@@ -1,9 +1,12 @@
-package lift;
+package lift.boundary;
 
 import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * Liste der Anfragen für Zielstockwerke.
+ */
 public class Requests {
 	private final LinkedHashSet<Integer> floors = new LinkedHashSet<>();
 	
