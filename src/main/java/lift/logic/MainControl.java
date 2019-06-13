@@ -1,7 +1,7 @@
 package lift.logic;
 
-import lift.boundary.Doors;
-import lift.boundary.Requests;
+import javax.inject.Inject;
+
 import lift.stm.State;
 import lift.stm.Transition;
 
@@ -9,7 +9,7 @@ import lift.stm.Transition;
  * MainControl für eine Liftsteuerung, State-Machine siehe Aufgabenstellung.
  *
  */
-public class MainControl {
+public class MainControl extends StateMachine {
 
 	/**
 	 * Die Anfragen nach oben. Diese werden über {@link #requestUp(int)}
@@ -17,7 +17,8 @@ public class MainControl {
 	 * der "Floor" aus dem Stockwerk ergibt, oder die Schalter im Lift, wobei das
 	 * "up/down" dann berechnet werden -- das interessiert hier aber aktuell nicht.
 	 */
-	final Requests upRequests = new Requests();
+	@Inject
+	/* final */ IRequests upRequests;
 
 	/**
 	 * Die Anfragen nach oben. Diese werden über {@link #requestDown(int)}
@@ -25,39 +26,34 @@ public class MainControl {
 	 * der "Floor" aus dem Stockwerk ergibt, oder die Schalter im Lift, wobei das
 	 * "up/down" dann berechnet werden -- das interessiert hier aber aktuell nicht.
 	 */
-	final Requests downRequests = new Requests();
+	@Inject
+	/* final */ IRequests downRequests;
 
+
+	/**
+	 * Die Türen.
+	 */
+	@Inject
+	IDoors doors;
+	
 	/**
 	 * Das aktuelle Stockwerk.
 	 */
 	int currentFloor = 0;
 
 	/**
-	 * Die Türen.
-	 */
-	Doors doors = new Doors();
-
-	/**
-	 * Der aktuelle Zustand, wird über {@link #start()} in den ersten Zustand
-	 * gesetzt. Public for testing!
-	 */
-	public State currentState = null;
-
-	/**
-	 * Der initiale Zustand, wird im Konstruktor gesetzt
-	 */
-	final State initialState;
-
-	/**
 	 * Flag das anzeigt, ob der Lift sich bewegt.
 	 */
-	private boolean moving;
+	boolean moving;
 
 	/**
 	 * Erzeugt die States mit Transitionen.
 	 */
-	public MainControl() {
-
+	public MainControl() {}
+	
+	@Override
+	protected lift.stm.State initStateMachine() {
+	
 		// zuerst alle States mit Verhalten (Behavior)
 		State initializing = new State("initializing") {
 			@Override
@@ -70,8 +66,6 @@ public class MainControl {
 				moveDown();
 			}
 		};
-
-		initialState = initializing;
 
 		State openingDoors = new State("openingDoors") {
 			@Override
@@ -95,6 +89,10 @@ public class MainControl {
 		new Transition(openingDoors, idle).when(() -> doors.isOpened());
 
 		// TODO ergänzen Sie hier die fehlenden Transitionen
+
+	
+		return initializing;
+	
 	}
 
 	/**
@@ -133,6 +131,15 @@ public class MainControl {
 
 	// TODO ergänzen Sie bei Bedarf hier weitere "Behaviours"
 
+	public synchronized void requestUp(int floor) {
+		upRequests.add(floor);
+	}
+
+	public synchronized void requestDown(int floor) {
+		downRequests.add(floor);
+	}
+
+	
 	@Override
 	public String toString() {
 		StringBuilder strb = new StringBuilder();
@@ -149,37 +156,4 @@ public class MainControl {
 		}
 		return strb.toString();
 	}
-
-	public synchronized void requestUp(int floor) {
-		upRequests.add(floor);
-	}
-
-	public synchronized void requestDown(int floor) {
-		downRequests.add(floor);
-	}
-
-	public void start() {
-		currentState = initialState;
-		currentState.activate();
-	}
-
-	/**
-	 * @return true wenn der State geändert wurde
-	 */
-	public boolean step() {
-		boolean changed = false;
-		Transition transition = currentState.trigger();
-		if (transition != null) {
-			currentState.deactivate();
-			currentState.exit();
-			currentState = transition.target;
-			currentState.entry();
-			currentState.activate();
-			changed = true;
-
-		}
-		currentState.do_();
-		return changed;
-	}
-
 }
