@@ -10,7 +10,7 @@ class SimpleLiftTest {
 
 	@Test
 	void test() {
-		System.out.println("Test 6");
+		System.out.println("Test 7");
 		main.start();
 		System.out.println(main);
 		for (int i = 0; i < 60; i++) {
