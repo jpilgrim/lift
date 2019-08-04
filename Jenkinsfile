@@ -26,7 +26,7 @@ node { //
 }
 */
 
-pipeline {
+node {
     agent any
     /*
     options {
