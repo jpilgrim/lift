@@ -28,6 +28,7 @@ node { //
 
 pipeline {
     agent any
+    /*
     options {
         buildDiscarder(
             logRotator(
@@ -39,7 +40,7 @@ pipeline {
         timeout(time: 6, unit: 'HOURS')
         timestamps()
     }
-
+   */
     environment {
         NODEJS_PATH= '/usr/bin' // '/shared/common/node-v10.15.3-linux-x64/bin'
         YARN_PATH  = '/usr/bin' // '/shared/common/yarn/1.15.2/bin'
