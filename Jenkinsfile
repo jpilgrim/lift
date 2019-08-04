@@ -60,4 +60,30 @@ pipeline {
             }
         }*/
     }
+
+    post {
+        always {
+         //   archiveArtifacts allowEmptyArchive: true, artifacts: '**/builds/**/target/products/*.zip'
+         //   archiveArtifacts allowEmptyArchive: true, artifacts: '**/tools/**/target/n4jsc.jar'
+         //   archiveArtifacts allowEmptyArchive: true, artifacts: '**/logs/*.log'
+         //   archiveArtifacts allowEmptyArchive: true, artifacts: '**/tests/**/target/**/*-output.txt'
+
+            junit '**/surefire-reports/**/*.xml'
+            //junit '**/failsafe-reports/**/*.xml'
+        }
+        // cleanup {
+            // excute here in case archiving fails in 'always'
+            //mail to: 'some.one@some.where.eu',
+            //     subject: "${currentBuild.result}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
+            //     body:  """\
+            //            ${currentBuild.result}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]':
+            //            Check console output at '${env.BUILD_URL}'
+            //            """
+
+            // Execute after every other post condition has been evaluated, regardless of status
+            // See https://jenkins.io/doc/book/pipeline/syntax/#post
+            // echo 'Cleaning up workspace'
+            // deleteDir()
+         // }
+    }
 }
