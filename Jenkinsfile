@@ -27,7 +27,7 @@ node { //
 */
 
 node {
-    agent any
+    
     /*
     options {
         buildDiscarder(
@@ -54,12 +54,7 @@ node {
         TIMESTAMP  = new Date().format("yyyyMMddHHmm")
     }
 
-    // triggers {
-    //    cron('H 23 * * *') // Nightly build every day a 11pm (23:00)
-    // }
-
-    stages {
-
+    
         stage('Build & Test') {
             steps {
                 wrap([$class: 'Xvnc', takeScreenshot: false, useXauthority: true]) {
@@ -99,74 +94,8 @@ node {
             }
         }
 
-        /*
-        stage('Sign') {
-            steps {
-                dir('n4js/builds/org.eclipse.n4js.product.build/target/products') {
-                    sh "pwd"
-
-                    // sign the macOS product
-                    sh """\
-                        mv      n4jside-macosx.cocoa.x86_64.zip          unsigned_n4jside-macosx.cocoa.x86_64.zip
-                        curl -o n4jside-macosx.cocoa.x86_64.zip -F file=@unsigned_n4jside-macosx.cocoa.x86_64.zip http://build.eclipse.org:31338/macsign.php
-                        rm unsigned_n4jside-macosx.cocoa.x86_64.zip
-                    """
-
-                    // bundle macOS product into a signed .dmg image
-                    sh """\
-                        curl -o n4jside-macosx.cocoa.x86_64.dmg -F sign=true -F source=@n4jside-macosx.cocoa.x86_64.zip http://build.eclipse.org:31338/dmg-packager
-                    """
-                }
-            }
-        }
-
-        stage('Deploy') {
-            steps {
-                echo 'START: moving old products / update sites to archive.eclipse.org (those that are older than a week):'
-                sh """\
-                    cd /home/data/httpd/download.eclipse.org/n4js
-                    find products/nightly -maxdepth 1 -type d -name 20\\* -mtime +7 -print -exec mv {} /home/data/httpd/archive.eclipse.org/n4js/{} \\;
-                    find updates/nightly  -maxdepth 1 -type d -name 20\\* -mtime +7 -print -exec mv {} /home/data/httpd/archive.eclipse.org/n4js/{} \\;
-                """
-                echo 'END: moving old products / update sites to archive.eclipse.org'
-
-                echo 'START: copying new products / update site to download.eclipse.org:'
-                sh """\
-                    mkdir  /home/data/httpd/download.eclipse.org/n4js/products/nightly/$TIMESTAMP
-                    cp     n4js/builds/org.eclipse.n4js.product.build/target/products/*.zip         /home/data/httpd/download.eclipse.org/n4js/products/nightly/$TIMESTAMP
-                    cp     n4js/builds/org.eclipse.n4js.product.build/target/products/*.dmg         /home/data/httpd/download.eclipse.org/n4js/products/nightly/$TIMESTAMP
-
-                    rm -rf /home/data/httpd/download.eclipse.org/n4js/products/nightly/LATEST
-                    mkdir  /home/data/httpd/download.eclipse.org/n4js/products/nightly/LATEST
-                    cp -R  /home/data/httpd/download.eclipse.org/n4js/products/nightly/$TIMESTAMP/* /home/data/httpd/download.eclipse.org/n4js/products/nightly/LATEST
-
-                    mkdir  /home/data/httpd/download.eclipse.org/n4js/updates/nightly/$TIMESTAMP
-                    cp -R  n4js/builds/org.eclipse.n4js.product.build/target/repository/*           /home/data/httpd/download.eclipse.org/n4js/updates/nightly/$TIMESTAMP
-
-                    rm -rf /home/data/httpd/download.eclipse.org/n4js/updates/nightly/LATEST
-                    mkdir  /home/data/httpd/download.eclipse.org/n4js/updates/nightly/LATEST
-                    cp -R  /home/data/httpd/download.eclipse.org/n4js/updates/nightly/$TIMESTAMP/*  /home/data/httpd/download.eclipse.org/n4js/updates/nightly/LATEST
-                """
-                echo 'END: copying new products / update site to download.eclipse.org'
-
-                // show a summary
-                script {
-                    def output = sh returnStdout: true, script: """\
-                        echo ******************** Products on download server:
-                        ls -l /home/data/httpd/download.eclipse.org/n4js/products/nightly
-                        echo ******************** Update sites on download server:
-                        ls -l /home/data/httpd/download.eclipse.org/n4js/updates/nightly
-                        echo ******************** Products on archive server:
-                        ls -l /home/data/httpd/archive.eclipse.org/n4js/products/nightly
-                        echo ******************** Update sites on archive server:
-                        ls -l /home/data/httpd/archive.eclipse.org/n4js/updates/nightly
-                        echo ********************
-                    """
-
-                    echo "$output"
-                }
-            }
-        } */
+        
+        
     }
 
     post {
