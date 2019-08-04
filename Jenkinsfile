@@ -45,7 +45,8 @@ pipeline {
                             git log -n 1
                             npm version
                         """
-                        sh "mvn clean verify -P${profiles} ${options}"
+                        // sh "mvn clean verify -P${profiles} ${options}"
+                        sh "mvn clean verify ${options}"
 
                       // sh "ls -Ral builds/org.eclipse.n4js.product.build/target/repository/"
                     }
