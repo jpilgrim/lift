@@ -1,46 +1,6 @@
-/*
-node { //
-   def mvnHome
-   stage('Preparation') { // for display purposes
-      // Get some code from a GitHub repository
-      git 'https://github.com/jpilgrim/lift.git'
-      // Get the Maven tool.
-      // ** NOTE: This 'M3' Maven tool must be configured
-      // **       in the global configuration.           
-      mvnHome = tool 'M3'
-   }
-   stage('Build') {
-      // Run the maven build
-      withEnv(["MVN_HOME=$mvnHome"]) {
-         if (isUnix()) {
-            sh '"$MVN_HOME/bin/mvn" -Dmaven.test.failure.ignore clean package'
-         } else {
-            bat(/"%MVN_HOME%\bin\mvn" -Dmaven.test.failure.ignore clean package/)
-         }
-      }
-   }
-   stage('Results') {
-      junit '** /target/surefire-reports/TEST-*.xml'
-      archiveArtifacts 'target/*.jar'
-   }
-}
-*/
+pipeline {
+    agent any
 
-node {
-    
-    /*
-    options {
-        buildDiscarder(
-            logRotator(
-                numToKeepStr:          '20',
-                artifactDaysToKeepStr: '14',
-                artifactNumToKeepStr:  '20',
-                daysToKeepStr:         '14'))
-        disableConcurrentBuilds()
-        timeout(time: 6, unit: 'HOURS')
-        timestamps()
-    }
-   */
     environment {
         NODEJS_PATH= '/usr/bin' // '/shared/common/node-v10.15.3-linux-x64/bin'
         YARN_PATH  = '/usr/bin' // '/shared/common/yarn/1.15.2/bin'
@@ -52,75 +12,19 @@ node {
         MAVEN_OPTS = '-Xmx4G'
         JAVA_HOME  = '/usr/lib/jvm/java-11-openjdk-amd64'
         TIMESTAMP  = new Date().format("yyyyMMddHHmm")
-    }
+   }
 
-    
-        stage('Build & Test') {
+    stages {
+        stage('Build and Test') {
             steps {
-                wrap([$class: 'Xvnc', takeScreenshot: false, useXauthority: true]) {
-                    dir('lift') {
-                        script {
-                            def options = [
-                                '--batch-mode',
-                                //'--quiet',
-                                '--update-snapshots',
-                                '--show-version',
-                                '-Dtycho.localArtifacts=ignore',
-                                '-Dmaven.test.failure.ignore',
-                                '-DWORKSPACE=' + env.WORKSPACE,
-                                '-DexcludeJRE'
-                            ].join(' ')
-                            def profiles = [
-                                'buildProduct',
-                                'execute-plugin-tests',
-                                'execute-plugin-ui-tests',
-                                'execute-ecma-tests',
-                                'execute-accesscontrol-tests',
-                                'execute-smoke-tests'
-                               //'execute-hlc-integration-tests'
-                            ].join(',')
-
-                            sh """\
-                                pwd
-                                git log -n 1
-                                npm version
-                            """
-                            sh "mvn clean verify -P${profiles} ${options}"
-
-                            // sh "ls -Ral builds/org.eclipse.n4js.product.build/target/repository/"
-                        }
-                    }
-                }
+                echo 'Building and testing..'
             }
         }
-
-        
-        
-    }
-
-    post {
-        always {
-         //   archiveArtifacts allowEmptyArchive: true, artifacts: '**/builds/**/target/products/*.zip'
-         //   archiveArtifacts allowEmptyArchive: true, artifacts: '**/tools/**/target/n4jsc.jar'
-         //   archiveArtifacts allowEmptyArchive: true, artifacts: '**/logs/*.log'
-         //   archiveArtifacts allowEmptyArchive: true, artifacts: '**/tests/**/target/**/*-output.txt'
-
-            junit '**/surefire-reports/**/*.xml'
-            //junit '**/failsafe-reports/**/*.xml'
-        }
-        // cleanup {
-            // excute here in case archiving fails in 'always'
-            //mail to: 'some.one@some.where.eu',
-            //     subject: "${currentBuild.result}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
-            //     body:  """\
-            //            ${currentBuild.result}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]':
-            //            Check console output at '${env.BUILD_URL}'
-            //            """
-
-            // Execute after every other post condition has been evaluated, regardless of status
-            // See https://jenkins.io/doc/book/pipeline/syntax/#post
-            // echo 'Cleaning up workspace'
-            // deleteDir()
-         // }
+        /*
+        stage('Deploy') {
+            steps {
+                echo 'Deploying....'
+            }
+        }*/
     }
 }
