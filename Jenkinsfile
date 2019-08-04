@@ -17,6 +17,7 @@ pipeline {
     stages {
         stage('Build and Test') {
             steps {
+                echo 'Starting Xvnc'
                 wrap([$class: 'Xvnc', takeScreenshot: false, useXauthority: true]) {
                     echo 'Building and testing..'
                 // dir('lift') {
