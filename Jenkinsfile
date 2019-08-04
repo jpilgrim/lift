@@ -53,9 +53,9 @@ pipeline {
         TIMESTAMP  = new Date().format("yyyyMMddHHmm")
     }
 
-    triggers {
-        cron('H 23 * * *') // Nightly build every day a 11pm (23:00)
-    }
+    // triggers {
+    //    cron('H 23 * * *') // Nightly build every day a 11pm (23:00)
+    // }
 
     stages {
 
