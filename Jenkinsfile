@@ -18,7 +18,7 @@ pipeline {
         stage('Build and Test') {
             steps {
                 echo 'Building and testing..'
-                dir('lift') {
+                // dir('lift') {
                     script {
                         def options = [
                             '--batch-mode',
@@ -50,7 +50,7 @@ pipeline {
 
                       // sh "ls -Ral builds/org.eclipse.n4js.product.build/target/repository/"
                     }
-                }
+                // }
             }
         } // end stage
         /*
