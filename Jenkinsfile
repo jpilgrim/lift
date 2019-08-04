@@ -179,7 +179,7 @@ pipeline {
             junit '**/surefire-reports/**/*.xml'
             //junit '**/failsafe-reports/**/*.xml'
         }
-        cleanup {
+        // cleanup {
             // excute here in case archiving fails in 'always'
             //mail to: 'some.one@some.where.eu',
             //     subject: "${currentBuild.result}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
@@ -192,6 +192,6 @@ pipeline {
             // See https://jenkins.io/doc/book/pipeline/syntax/#post
             // echo 'Cleaning up workspace'
             // deleteDir()
-         }
+         // }
     }
 }
