@@ -189,8 +189,8 @@ pipeline {
 
             // Execute after every other post condition has been evaluated, regardless of status
             // See https://jenkins.io/doc/book/pipeline/syntax/#post
-            echo 'Cleaning up workspace'
-            deleteDir()
+            // echo 'Cleaning up workspace'
+            // deleteDir()
          }
     }
 }
