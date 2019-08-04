@@ -17,7 +17,8 @@ pipeline {
     stages {
         stage('Build and Test') {
             steps {
-                echo 'Building and testing..'
+                wrap([$class: 'Xvnc', takeScreenshot: false, useXauthority: true]) {
+                    echo 'Building and testing..'
                 // dir('lift') {
                     script {
                         def options = [
@@ -50,8 +51,9 @@ pipeline {
 
                       // sh "ls -Ral builds/org.eclipse.n4js.product.build/target/repository/"
                     }
-                // }
-            }
+                // } // end dir
+                } // end wrap
+            } // end steps
         } // end stage
         /*
         stage('Deploy') {
